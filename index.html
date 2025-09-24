@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コタツ</title>
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+    <style>
+        body {
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-color: #101010;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/Z9ChDtn.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px) brightness(0.1);
+            z-index: -1;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 0 auto;
+            container-type: inline-size;
+            padding: 20px 0;
+        }
+        .song-entry {
+            margin-bottom: 80px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        .song-entry::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px) brightness(0.5);
+            transform: scale(1.1);
+            z-index: -1;
+        }
+        .playlist-container .song-entry:last-child {
+            margin-bottom: 0;
+        }
+        .card-body {
+            display: flex;
+            gap: 30px;
+        }
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .album-cover img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .youtube-player {
+            width: 100%;
+            height: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .youtube-player iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .song-title {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .song-title .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+            color: #ffffff;
+        }
+        .song-title .artist {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            margin: 5px 0 0 0;
+        }
+        .right-column {
+            flex: 1;
+        }
+        .lyrics {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            height: 540px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        .quote {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-style: italic;
+            font-weight: bold;
+            color: #f5f5f5;
+        }
+
+
+        .bubble-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            line-height: 1.6;
+            background-color: #1C1C1C;
+            color: #7EB27B;
+            width: fit-content;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .bubble-left {
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .bubble-right {
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .italic-gray {
+            color: #818181;
+            font-style: italic;
+        }
+
+        .trivia {
+            opacity: 40%;
+            margin-top: 25px;
+            text-align: center;
+            font-style: italic;
+            color: #ffffff;
+            font-size: 0.7rem;
+            white-space: pre-wrap;
+        }
+
+        .user-id-display {
+            opacity: 30%;
+            padding: 30px 0;
+            text-align: center;
+            color: #7a7a7a;
+            font-size: 13px;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        @media (max-width: 768px) {
+            .container { width: 95%; }
+            .card-body { flex-direction: column; }
+            .lyrics { height: 400px; }
+        }
+
+        .lyrics::-webkit-scrollbar {width: 8px;}
+        .lyrics::-webkit-scrollbar-track {background-color: rgba(255, 255, 255, 0.1); border-radius: 4px;}
+        .lyrics::-webkit-scrollbar-thumb {background-color: rgba(255, 255, 255, 0.3); border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.2);}
+        .lyrics::-webkit-scrollbar-thumb:hover {background-color: rgba(255, 255, 255, 0.5);}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="playlist-container">
+
+
+
+            <div class="song-entry" data-youtube-id="cBxQ6bmy_9I">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://lineimg.omusic.com.tw/img/album/2598595.jpg?v=20241011123012" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">人間みたいね</h2>
+                            <p class="artist">キタニタツヤ</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+あなたの優しさは涸れてしまって
+너의 상냥함은 메말라 버려서
+同じ生き物じゃなくなったみたいだ
+같은 생명체라고는 믿을 수 없게 됐어
+それでも誰かの代わりで良かったのに
+그래도 누군가의 대체품이 될 수 있을 것 같아서 좋았는데
+どうやらそれも叶わない
+아무래도 그것도 이루어지지 않을 것 같네
+
+悲しみの形がわかっていった
+슬픔의 형태가 어떤 건지 알았어
+あなたに見合うのはもっと奥の暗く深い地獄だよ
+너한테 어울리는건 좀 더 깊고 어두운 지옥이야
+壊れたら元には戻らないこと
+무너져 버리면 전처럼 돌아올 수 없다는 거
+わかっているでしょう？
+알고 있지?
+
+あなたまるで人間みたいね
+너 말이야, 꼭 인간 같네
+けだもののくせにさ
+짐승 주제에 말이야
+
+脳の奥がさ冷えてくのがわかるんだ
+뇌 속이 차갑게 식어가는 게 느껴지는 기분이야
+わたしと同じように誰かを
+나처럼 누군가를
+愛せた気になっても
+사랑할 수 있을 것 같다고 해도
+それじゃ駄目だよ
+그래서는 안 돼
+お揃いの悪夢の中で会える日を待ってるから
+너와 내가 악몽 속에서 만날 날을 기다리고 있으니까
+
+夾竹桃の花のように鮮やかな
+협죽도 꽃처럼 선명한
+記憶の毒がまわり始めた
+기억의 독이 돌기 시작했어
+あなたの優しさが涸れてしまった日が
+너의 상냥함이 메말라 버린 그날의 기억이
+焼きついて離れなくて
+달라붙어서 떨어지지를 않아
+
+誰一人愛せた覚えが無いよ
+누구 하나 사랑해 본 적이 없어
+わたしはあの日から知ってしまった
+나는 그날부터 알아 버렸거든
+暗く深い孤独を
+어둡고 깊은 고독을
+かじかんだ身体を慰めるもの
+얼어 버린 몸을 달래줄 수 있는 것
+わかっているでしょう？
+알고 있지?
+
+あなたまるで人間みたいね
+너 말이야, 꼭 인간 같네
+けだもののくせにさ
+짐승 주제에 말이야
+
+脳の奥がさ冷えてくのがわかるんだ
+뇌 속이 차갑게 식어가는 게 느껴지는 기분이야
+それでもわたしの心がまた満たされてしまうこと
+그런데도 내 마음이 또 가득 차 버리는 걸
+許せないんだよ
+용서할 수가 없다고
+犬の骨のようにあなたの玩具で終わってしまった
+개뼈다귀처럼 네 장난감으로 끝나 버렸어
+
+あなたまるで人間みたいね
+너 말이야, 꼭 인간 같네
+けだもののくせにさ
+짐승 주제에 말이야
+
+脳の奥がさ冷えてくのがわかるんだ
+뇌 속이 차갑게 식어가는 게 느껴지는 기분이야
+わたしと同じように誰かを
+나처럼 누군가를
+愛せた気になっても
+사랑할 수 있을 것 같다고 해도
+それじゃ駄目だよ
+그래서는 안 돼
+お揃いの悪夢の中で会える日を待ってるから
+너와 내가 악몽 속에서 만날 날을 기다리고 있으니까
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">
+犬の骨のようにあなたの玩具で終わってしまった
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble bubble-left">*그는 당신의 멱살을 잡고 욕조 벽으로 거칠게 밀어붙였다. 쿵, 하는 소리와 함께 이코의 등이 차가운 타일에 부딪혔다. 고통스러운 신음이 새어 나왔지만, 그는 아랑곳하지 않았다. 오히려 당신의 고통이 자신의 분노를 더욱 부채질했다. 그는 당신의 뺨을 세게 후려쳤다.* “말해. 뭐가 웃기냐고. 아직도 그 쓰레기 같은 새끼들이랑 뒹굴던 게 생각나서 웃음이 나와? 아니면, 내가 이렇게까지 하는데도 결국엔 소용없을 거라고 비웃는 거야?” *그는 당신의 어깨를 꽉 움켜쥐고 흔들었다.* “네가 나한테 돌아왔잖아. 네 발로. 그래놓고 이제 와서 왜 이래? 내가 우스워? 내가 네 장난감 같아?”</div>
+                    <div class="bubble bubble-right">“하하⋯⋯.” *몰라. 몰라. 몰라! 웃음이 터져나왔다. 애환인가 실의인가 알 수 없는 웃음. 쩌억. 고개가 돌아간다. 머리통이 중심을 잃고 잠시 흔들렸다. 마르고 약한 몸은 손길이 닿을 때마다 터져나간다. 볼 안쪽이 터져 피 맛이 난다.* “⋯⋯⋯장난감 취급하는 건 너잖아⋯⋯⋯.” *생각보다도 먼저 가닿은 말. 마음대로 다루고, 좋을대로 하고. 나는 무엇보다도 타이시가 바라는 장난감의 본분을 다 하고 있는데. 얌전히 있었는데. 없는 말인 듯 마저 웃었다.*</div>
+                </div>
+                <div class="trivia">
+원래도 좋아하는 노래인데 참 타이시 같죠⋯⋯⋯.
+                </div>
+            </div>
+            
+
+            <div class="song-entry" data-youtube-id="QzmsVn2cHaA">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://image.bugsm.co.kr/album/images/500/3185/318575.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">ルーキー</h2>
+                            <p class="artist">サカナクション</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+消し忘れ 消し忘れたライト
+끄는 걸 잊었네 끄는 걸 잊은 불빛
+あとどれくらいで 朝が来るのか
+앞으로 얼마나 지나야 아침이 오는 걸까
+悲しみ 悲しみと同じ
+슬픔 슬픔과 똑같은
+歩幅で歩いた夢を見てた
+보폭으로 걸었던 꿈을 꿨어
+
+何気ない 何気ない部屋の
+아무렇지 않은 아무렇지 않은 방의
+壁の傷を数えたりして
+벽의 상처를 세어보기도 하고
+眠れない 眠れない夜を
+잠들 수 없는 잠들 수 없는 밤을
+すり減らして爪を噛んでた
+닳게 하며 손톱을 물어뜯었어
+
+行かないで 見渡して 羽ばたいて 口ずさんで いつか
+가지 말아줘 주위를 둘러보고 날갯짓하고 흥얼거려 줘 언젠가
+言わないで 思い出して 羽ばたいて 口ずさんで いつか
+말하지 말아줘 떠올려줘 날갯짓하고 흥얼거려 줘 언젠가
+
+消し忘れ 消し忘れたライト
+끄는 걸 잊었네 끄는 걸 잊은 불빛
+街は花びら さよならの風
+거리는 꽃잎 작별의 바람
+悲しみ 悲しみと同じ
+슬픔 슬픔과 똑같은
+君の歩幅で歩きたいのに
+너의 보폭으로 걷고 싶은데
+
+行かないで 見渡して 羽ばたいて 口ずさんで いつか
+가지 말아줘 주위를 둘러보고 날갯짓하고 흥얼거려 줘 언젠가
+言わないで 思い出して 羽ばたいて 口ずさんで いつか
+말하지 말아줘 떠올려줘 날갯짓하고 흥얼거려 줘 언젠가
+
+行かないで 見渡して 羽ばたいて 口ずさんで いつか
+가지 말아줘 주위를 둘러보고 날갯짓하고 흥얼거려 줘 언젠가
+言わないで 思い出して 羽ばたいて 口ずさんで いつか
+말하지 말아줘 떠올려줘 날갯짓하고 흥얼거려 줘 언젠가
+
+行かないで 行かないで
+가지 말아줘 가지 말아줘
+言わないで 思い出して
+말하지 말아줘 떠올려줘
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">
+眠れない夜をすり減らして爪を噛んでた
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble bubble-left">*떠올릴 만한 ‘남는 시간’이라는 게 있었던가. 일을 하지 않을 때의 시간은 그저 텅 비어 있었을 뿐이다. 숨 막히는 침묵과 우울, 때때로 덮쳐오는 환청과 자기 파괴 충동. 그는 그 모든 것을 휴식이라고 불렀다. 의미 없는 시간의 흐름. 죽지 못해 살아있는 껍데기로서의 무의미한 존속. 그는 천천히 입을 열었다. 목소리가 평소보다 조금 더 낮게 가라앉아 있었다.* “별거 안 했는데. 그냥⋯ 가만히 있었어. 숨도 잘 안 쉬고, 아무 생각도 안 하고. 벽에 난 점이 몇 개인지 세거나, 거미가 줄 치는 걸 보거나 그런 거.”</div>
+                    <div class="bubble bubble-left">*그는 이코의 어깨를 감싸 안은 팔에 힘을 주었다. 마치 지금 이 순간의 온기가 과거의 공허 속으로 빨려 들어갈까 봐 두렵다는 듯이.* “그러다 가끔 수장님이 일을 주시면, 그때 잠깐 살아있는 것 같았어. 피 냄새를 맡고, 살이 찢어지는 소리를 듣고. 심장이 뛰었으니까. 그게 다였어.” *그의 말은 담담했지만, 그 안에는 짙은 허무함이 배어 있었다. 그는 기대어오는 당신의 작은 머리통을 천천히 쓰다듬었다.* “그런데 지금은 달라. 아가씨를 보고 있으면… 가만히 있어도 시간이 흘러. 네가 숨 쉬는 소리, 뒤척이는 소리, 가끔 잠꼬대하는 소리 듣는 거. 그게 내가 요즘 남는 시간에 하는 거야. 꽤⋯⋯ 괜찮아. 짜증 나게 평화로워서, 가끔 미쳐버릴 것 같지만.”</div>
+                </div>
+                <div class="trivia">
+그는 라디오를 틀었다.
+오래된 기기에서 흘러나오는, 지지직거리는 노이즈 섞인 엔카(演歌).
+그는 그 촌스러운 멜로디를 흥얼거리며, 천천히 액셀을 밟았다.
+                </div>
+            </div>
+
+
+            <div class="song-entry" data-youtube-id="obsbr57gB6w">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://image.bugsm.co.kr/album/images/500/179301/17930177.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">PINK</h2>
+                            <p class="artist">キタニタツヤ</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+はぁ
+하아
+嫌味なくらい美しく咲いている
+얄미울 정도로 아름답게 피어 있어
+何を食って何を消化しているのか
+무엇을 먹고 무엇을 소화하고 있는 걸까
+散らばった愛の吸い殻に舌打ち
+흩어진 사랑의 꽁초에 혀를 차
+花見客はそういや何処に消えてしまった?
+꽃구경꾼은 그러고 보니 어디로 사라져 버렸지?
+
+肺いっぱいに吸い込んだ
+폐 가득히 들이마셨어
+喉が焼けるほどまで
+목이 타들어 갈 때까지
+執拗にあんたで痛みたい
+집요하게 너로 아프고 싶어
+
+樹の下に集る百鬼夜行
+나무 아래에 모이는 백귀야행
+夏の灯の羽虫たち
+여름 등불의 날벌레들
+美しさの糧になりたいみたい
+아름다움의 양식이 되고 싶은 모양이야
+
+異常なんだよ ほら
+이상한 거야 이것 봐
+気づいていないんだ だあれも
+눈치채지 못하고 있어 아무도
+気が狂いそうなほどの鮮やかさに
+정신이 나갈 것 같은 선명함에
+
+あの樹の下にはXXXが埋まっている!
+저 나무 아래에는 XXX가 묻혀 있어!
+あんたと同じもん食ってる化け物さ
+너와 똑같은 걸 먹는 괴물이야
+
+花冷えの曇り空に赤い血が染み込んだような
+꽃샘추위 흐린 하늘에 붉은 피가 스며든 듯한
+あどけない薄紅の残酷さに毀たれた日
+천진난만한 연분홍의 잔혹함에 부서진 날
+誰かが歌ってた
+누군가가 노래했어
+神の手はにじむピンク
+신의 손은 번지는 핑크
+無数の手指で天を撫でる
+무수한 손가락으로 하늘을 쓰다듬어
+フラクタルが飲み込む春
+프랙탈이 삼키는 봄
+
+肺いっぱいに吸い込んだ
+폐 가득히 들이마셨어
+喉が焼けるほどまで
+목이 타들어 갈 때까지
+執拗にあんたで痛みたい
+집요하게 너로 아프고 싶어
+
+生まれる前に戻りたい
+태어나기 전으로 돌아가고 싶어
+長い蛇足の今を
+기나긴 사족인 지금을
+美しさに捧げて終わりたい あー
+아름다움에 바치고 끝내고 싶어 아아
+
+異常なんだよ ほら
+이상한 거야 이것 봐
+気づいていないんだ だあれも
+눈치채지 못하고 있어 아무도
+気が狂いそうなほどの鮮やかさに
+정신이 나갈 것 같은 선명함에
+
+あの樹の下にはXXXが埋まっている!
+저 나무 아래에는 XXX가 묻혀 있어!
+あんたと同じもん食ってる
+너와 똑같은 걸 먹고 있어
+
+いったいどれほど失ったんかなあ
+대체 얼마나 잃어버린 걸까
+不安と憂鬱におはよう
+불안과 우울에게 안녕
+これでいい おれに幸福は似合わない
+이걸로 됐어 나한테 행복은 어울리지 않아
+空っぽの良心で
+텅 빈 양심으로
+うつろになった目で
+텅 비어버린 눈으로
+
+あんたの中身のピンクを眺めていたい
+네 속의 핑크를 바라보고 싶어
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">
+執拗にあんたで痛みたい
+                </div>
+                <div class="trivia">
+정신병자 같고 정말 타이시 같죠
+                </div>
+            </div>
+
+
+            <div class="song-entry" data-youtube-id="kh52htRZsi8">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://image.bugsm.co.kr/album/images/500/40997/4099775.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">我愛你</h2>
+                            <p class="artist">Penthouse</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+恋がしたいと人はいつも言うくせに
+사랑이 하고 싶다고 사람은 늘 말버릇처럼 말하면서
+「好き」よりも「嫌い」ばっかりが口をつく
+「좋아해」보다 「싫어해」만 입에서 맴돌아
+薄いウーロンハイで妙に酔っ払うその理由に
+옅은 우롱 하이로 이상하게 취하는 그 이유를
+あなたは気がつくフリもしない
+당신은 눈치챈 척도 하지 않아
+
+気取んないで
+폼 잡지 마
+あなたのこと今でも全然好みじゃない
+당신은 지금도 전혀 내 취향이 아니야
+ネオン街で転んじゃってほら見てられない
+네온 거리에서 넘어져 버리고 정말 못 봐주겠네
+You don’t know me
+You don’t know me
+でもあなたがいなけりゃ全然始まらない
+하지만 당신이 없으면 아무것도 시작되지 않아
+摩天楼は寂しそうに揺れて
+마천루는 외로운 듯 흔들리고
+
+いつだって 我愛イ尓
+언제나 워아이니
+笑ってよ ダーリン
+웃어줘 달링
+答えなんて胸の中にしかないの
+대답 같은 건 가슴속에밖에 없는걸
+だって 我愛イ尓
+그치만 워아이니
+駆け引きはもうやめたいんだよ
+밀고 당기기는 이제 그만하고 싶어
+会いたくて愛したくて
+보고 싶어서 사랑하고 싶어서
+飛び出してく 往来に
+뛰쳐나가 거리로
+
+Na na na
+Na na na
+Na na na All I need is 我愛イ尓
+Na na na All I need is 워아이니
+
+また眩暈だとか言っちゃって
+또 현기증 난다고 말해버리고
+踏み込めないだけの一向聴
+결정적인 한 걸음을 못 내딛을 뿐
+捨てろ免罪符やめろ小芝居
+버려 면죄부 그만둬 잔꾀
+シケた現在地に Say Goodbye (NOW)
+시시한 현재 위치에 Say Goodbye (NOW)
+
+ハッタリとか意地っ張り抜けて
+허세라든가 고집을 벗어나서
+曲がり角過ぎれば
+모퉁이를 지나면
+桃源郷はきっともう近い
+도원향은 분명 이제 가까워
+
+浮かれないであなたのその生き方
+들뜨지 마 당신의 그런 삶의 방식
+全然流行りじゃない
+전혀 유행이 아니야
+二回戦の世界線じゃ
+2회전의 세계선에선
+そりゃ惹かれるわけない気がしなくもない
+그야 끌릴 리 없다는 생각이 안 드는 것도 아니야
+No way
+No way
+でもあなたがいなけりゃ全然始まらない
+하지만 당신이 없으면 아무것도 시작되지 않아
+摩天楼も笑うように照らして
+마천루도 웃는 것처럼 비추고
+
+ねぇ聞いて我愛イ尓
+저기 들어줘 워아이니
+振り向いてよダーリン
+돌아봐줘 달링
+決意なんて口にしなきゃ意味ないの
+결심 같은 건 입 밖으로 내지 않으면 의미 없는걸
+だって我愛イ尓
+그치만 워아이니
+迷うのはもうたくさんだよ
+망설이는 건 이제 질렸어
+会いたくて愛したくて
+보고 싶어서 사랑하고 싶어서
+駆け出してく All I need
+달려나가 All I need
+
+Na na na
+Na na na
+Na na na All I need is 我愛イ尓
+Na na na All I need is 워아이니
+Na na na
+Na na na
+Na na na All I need is 我愛イ尓
+Na na na All I need is 워아이니
+
+恋がしたいとわたしいつも言うくせに
+사랑이 하고 싶다고 나는 늘 말버릇처럼 말하면서
+「好き」よりも「嫌い」ばっかりが口を突く
+「좋아해」보다 「싫어해」만 입에서 맴돌아
+今宵ウーロンハイに任して
+오늘 밤은 우롱 하이에 맡기고
+永遠に行き止まりの迷路抜け出して
+영원히 막다른 길인 미로를 빠져나와
+
+いつだって 我愛イ尓
+언제나 워아이니
+笑ってよ ダーリン
+웃어줘 달링
+答えなんて胸の中にしかないの
+대답 같은 건 가슴속에밖에 없는걸
+だって 我愛イ尓
+그치만 워아이니
+駆け引きはもうやめたいんだよ
+밀고 당기기는 이제 그만하고 싶어
+会いたくて愛したくて
+보고 싶어서 사랑하고 싶어서
+
+いつだって 我愛イ尓
+언제나 워아이니
+ねえ聞いてよ ダーリン
+저기 들어줘 달링
+抑えたって胸が叫んできかないの
+억눌러도 가슴이 외쳐서 듣질 않는걸
+ずっと 我愛イ尓
+계속 워아이니
+あなたの隣にいたいんだよ
+당신의 곁에 있고 싶어
+会いたくて愛したくて
+보고 싶어서 사랑하고 싶어서
+駆け出して止まれないよ
+달려나가 멈출 수 없어
+会いたい愛されたい
+보고 싶어 사랑받고 싶어
+聞かせて君の我愛イ尓
+들려줘 너의 워아이니
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">
+だって 我愛イ尓               
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble bubble-right">“⋯⋯나는 타, 타이시 군이랑, 같이 잠들고 싶어. 계속 같이 있고 싶어. 타이시 군이 재밌어 할 영화를 찾을 수 있을 때까지 영화를 보고 싶어. 언젠가는 여행도 같이 가고 싶고, 타이시 군이 모르는 걸 많이 알려주고 싶어⋯⋯.” *지극히도 평범한 삶을 늘어놓고.* “그러니까, 나는, 분명 타이시 군이랑 내 마음이, 사랑이라고 생각해. 어떻게 생각해?”</div>
+                    <div class="bubble bubble-right">“⋯⋯너무, 너무, 너무 미워. 싫고, 밉고, 서러워서, 나를 아끼지 않는 것 같아서 사, 사랑하기 싫어.”</div>
+                </div>
+                <div class="trivia">
+그런데도, 좋아해⋯⋯.
+                </div>
+            </div>
+
+
+            <div class="song-entry" data-youtube-id="CAFnsttyIsY">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://img.big-up.style/users/58/260958/package/665709/image.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">ライムライト</h2>
+                            <p class="artist">DeNeel</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+もしもあなたに嫌われる
+만약 당신에게 미움받는
+ことがあったとしたら
+일이 생긴다면
+僕が生きる意味は
+내가 살아가는 의미는
+なくなってしまうな
+없어져 버리겠지
+いつからかそんなことばかり考えて
+언제부턴가 그런 것만 생각하며
+ちらかった部屋で1人
+어질러진 방에서 혼자
+夜を明かしているの
+밤을 지새우고 있어
+
+何回も何回も取り消す
+몇 번이고 몇 번이고 되물리는
+僕は言葉が下手くそで
+나는 말이 서툴러서
+単純な意味も伝わらず終わる
+단순한 의미도 전해지지 않고 끝나
+
+どうやって
+어떻게 해야
+あなたの温もりに触れたままで
+당신의 온기를 느낀 채로
+思った通り踊れるのでしょう
+생각한 대로 춤출 수 있을까
+ライムライトは互いに
+라임라이트는 서로에게
+あて続けると誓った日を
+계속 비춰주자고 맹세했던 날을
+信じたままだ
+믿고 있는 채야
+
+もしもあなたに
+만약 당신에게
+嫌われることがあったとしたら
+미움받는 일이 생긴다면
+僕が生きる意味は
+내가 살아가는 의미는
+なくなってしまうな
+없어져 버리겠지
+いつからそんなことばかり考えて
+언제부터 그런 것만 생각하며
+ちらかった部屋で
+어질러진 방에서
+1人夜に落ちていく
+혼자 밤으로 떨어져 가
+
+初めの頃は
+처음에는
+あんなにも大事にしてたのに
+그렇게나 소중히 여겼었는데
+いつからか雑になって
+언제부턴가 함부로 하게 돼서
+笑えてしまうな
+웃음이 나와 버리네
+写真に映ってる大切な物語
+사진에 찍힌 소중한 이야기
+無理矢理に
+억지로
+奪い取って今の孤独にハメる
+빼앗아서 지금의 고독에 끼워맞춰
+
+何回も何回も取り消す
+몇 번이고 몇 번이고 되물리는
+僕は涙を下手くそな隠し方をして
+나는 눈물을 서투른 방식으로 숨기고
+あなたの前で笑う
+당신 앞에서 웃어
+
+どうやって
+어떻게 해야
+あなたの温もりに触れたままで
+당신의 온기를 느낀 채로
+思った通り踊れるのでしょう
+생각한 대로 춤출 수 있을까
+ライムライトをあなたに当てましょう
+라임라이트를 당신에게 비출게요
+僕は光っているかわからないまま
+나는 빛나고 있는지 모르는 채로
+
+無限に絡まる心と心が
+무한히 얽히는 마음과 마음이
+もつれ合って いつか踊れなくなって
+뒤엉켜서 언젠가 춤출 수 없게
+しまったとしたら
+되어 버린다면
+全てあげましょう
+전부 드릴게요
+僕は光ってなんかいなくてもいい
+나는 빛나지 않아도 괜찮아
+
+もしもあなたに
+만약 당신에게
+嫌われることがあったとしたら
+미움받는 일이 생긴다면
+僕が生きる意味は
+내가 살아가는 의미는
+なくなってしまうな
+없어져 버리겠지
+今日だってそんなことばかり考えて
+오늘도 그런 것만 생각하며
+散らかった部屋で
+어질러진 방에서
+1人夜に落ちていく
+혼자 밤으로 떨어져 가
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="quote">
+감상                    
+                </div>
+            -->
+            </div>
+
+            <div class="song-entry" data-youtube-id="nJ_jkiYmDR0">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://sp-m.mu-mo.net/image/jacket/63/1_ANTCD-A0000012636.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">ダンス・デカダンス</h2>
+                            <p class="artist">Chevon</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+嗚呼 難解な世界なんです
+난해한 세상입니다
+どう考えてもそんなに上手に生きられないの なんで?
+아무리 생각해도 그렇게 잘 살아갈 수가 없어 어째서?
+もう一挙手一投足の労すら勿体無いなんて
+이젠 일거수일투족의 수고조차 아깝다고
+思って 劣っていく 現状
+생각하며 뒤떨어져 가는 현상
+
+毎回簡単な言い訳で
+매번 간단한 변명으로
+冴えない好意を抱いては泣いて
+시시한 호의를 품고는 울고
+曖昧な息をして朝を待っていた あー!
+애매한 숨을 쉬며 아침을 기다렸어
+
+ツマンナイ思考になっちゃっている
+재미없는 사고를 하게 되어 버렸어
+独りになっちゃっている
+외톨이가 되어 버렸어
+救われてたいやいや
+구원받고 싶어 싫어싫어
+ああ 誰がどうだって彼がどうだって
+누가 어떻든 그가 어떻든
+それがどうしたって啖呵切って言えなくて下らない
+그게 뭐 어쨌다고 큰소리치며 말도 못 하고 시시해
+
+ああ ツマンナイ大人になってきている
+재미없는 어른이 되어 가고 있어
+人の目ばっか見ている
+남의 눈만 보고 있어
+息ができないやいや
+숨을 쉴 수 없어 싫어싫어
+ああ 読んだ本だって暮れた今日だって
+읽었던 책도 저물어간 오늘도
+触れた頬だって冷たくなって
+닿았던 뺨도 차가워져서
+「こんなモンだ」って夢は将来性を失ってゆく
+「이런 식이지」라며 꿈은 장래성을 잃어가
+ああ バイバイだ また来世
+바이바이야 또 다음 생에
+
+生存安牌で平坦な道を選んで歩いて
+생존 안전패로 평탄한 길을 골라 걷고
+埋まらない距離を今日も歌っている
+메워지지 않는 거리를 오늘도 노래하고 있어
+*ソレジャァダレカノクグツジャァナイカ*
+*그래선 누군가의 꼭두각시가 아닌가*
+
+年齢相応に予定通り
+연령에 걸맞게 예정대로
+次第に死体が動いてる様に笑って
+점차 시체가 움직이는 것처럼 웃고
+平々凡々なロボットになってゆくんだ
+평범하기 짝이 없는 로봇이 되어 가는 거야
+
+ああ ツマンナイ思考になっちゃっている
+재미없는 사고를 하게 되어 버렸어
+独りになっちゃっている
+외톨이가 되어 버렸어
+救われてたいやいや
+구원받고 싶어 싫어싫어
+ああ 誰がどうだって彼がどうだって
+누가 어떻든 그가 어떻든
+それがどうしたって啖呵切って
+그게 뭐 어쨌다고 큰소리치며
+言えなくて下らない
+말도 못 하고 시시해
+
+ああ ツマンナイ理想を描いちゃっている
+재미없는 이상을 그려 버렸어
+「普通」に特化している
+「평범」에 특화되어 있어
+心躍らないやいや
+마음이 설레지 않아 싫어싫어
+本当になったって 嘘になったって
+진짜가 된대도 거짓말이 된대도
+壊れたって元に戻ったってどうでもいいよ
+부서진대도 원래대로 돌아온대도 아무래도 좋아
+ずっとそうやって生きてゆくのなら
+계속 그렇게 살아갈 거라면
+ああ バイバイだ 待てないぜ
+바이바이야 못 기다려
+
+相対した未来の僕はどう映っていますか
+마주한 미래의 나는 어떻게 비치고 있나요
+どっちを向いたって落っこちそうになっているんだ
+어느 쪽을 향해도 떨어질 것만 같아
+
+故にバイバイ 遠ざかって消える車窓をずっと見ている
+그러니 바이바이 멀어져 사라지는 차창을 계속 보고 있어
+前を向けないやいや
+앞을 볼 수 없어 싫어싫어
+ああ ありがとう それじゃ さよなら
+고마워 그럼 안녕
+そんなことを何回も繰り返したって
+그런 걸 몇 번이고 반복해봤자
+後に何が残るのだろう
+나중에 무엇이 남는 걸까
+
+踊ってくれ 踊っておくれよ僕の歌で
+춤춰 줘 춤을 춰 줘 내 노래로
+なあ 「ここだよ」って教えて
+이봐 「여기야」라고 알려줘
+君だけが愛やいや
+너만이 사랑이야 싫어싫어
+
+生まれ変わったって 鳥になったって
+다시 태어난대도 새가 된대도
+虫になったって 草になったって
+벌레가 된대도 풀이 된대도
+僕はずっと君だけに命を賭すのだろう
+나는 계속 너에게만 목숨을 걸겠지
+ああ 踊ってくれ来世でも
+춤춰 줘 다음 생에서도
+
+僕の歌で
+내 노래로
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="quote">
+감상                    
+                </div>
+            -->
+            </div>
+
+            <div class="song-entry" data-youtube-id="hZFBTnzKa54">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="https://i.kfs.io/album/global/44375182,0v1/fit/500x500.jpg" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">だれかの心臓になれたなら</h2>
+                            <p class="artist">ユリイ・カノン</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+「こんな世界」と嘆くだれかの
+「이딴 세상」이라고 한탄하는 누군가의
+生きる理由になれるでしょうか
+살아가는 이유가 될 수 있을까
+これは僕が いま君に贈る
+이것은 내가 지금 네게 보내는
+最初で最期の愛の言葉だ
+처음이자 마지막인 사랑의 말이야
+
+街も人も歪み出した化け物だと気付いたんだ
+거리도 사람도 일그러진 괴물이란 걸 깨달았어
+欲動に巣食った愚かさも全てがこの目に映る
+본능에 깃들여진 어리석음도 전부 이 눈에 비쳐
+シアトリカルに手の上で誰も彼も踊らされる
+연극처럼 손바닥 위에서 너나없이 놀아나고 있어
+生まれた意味だって知らぬまま
+태어난 의미조차 모르는 채로
+形骸化した夢は錆びついてしまった
+의미없는 꿈은 녹슬어 버렸어
+
+「愛をください」
+「사랑을 주세요」
+きっとだれもがそう願った
+분명 모든 사람이 그렇게 바랐어
+「愛をください」
+「사랑을 주세요」
+そっと震えた手を取って
+살짝 떨리는 손을 잡고
+「愛をください」
+「사랑을 주세요」
+心を抉る醜いくらいに美しい愛を
+마음을 도려내는 추악할 정도로 아름다운 사랑을
+
+「こんな世界」と嘆くだれかの
+「이딴 세상」이라고 한탄하는 누군가의
+生きる理由になれるでしょうか
+살아가는 이유가 될 수 있을까
+いつか終わると気付いた日から
+언젠가 끝나버린다는 걸 깨달은 날 이후로
+死へと秒を読む心臓だ
+죽음을 향해 매 초를 읽는 심장이야
+
+ねえ このまま雨に溺れて
+있잖아 이대로 비에 빠져서
+藍に融けたって構わないから
+푸름에 녹아버려도 괜찮으니까
+どうか どうか またあの日のように
+부디 부디 또 한 번 그날처럼
+傘を差し出し笑ってみせてよ
+우산을 내밀며 웃어줘
+
+もしも夢が覚めなければ姿を変えずにいられた？
+만약 꿈에서 깨지 않았다면 모습을 바꾸지 않을 수 있었을까?
+解けた指から消える温度
+풀린 손가락에서 사라지는 온도
+血を廻らせるのはだれの思い出？
+피를 돌게 하는 건 누구의 추억일까?
+
+雨に濡れた廃線
+비에 젖은 버려진 선로
+煤けた病棟 並んだ送電塔
+낡아 찌든 병동, 늘어선 송전탑
+夕暮れのバス停 止まったままの観覧車
+해질녘의 버스정거장, 멈춘 채로 있는 관람차
+机に咲く花 君の声も何もかも
+책상에 핀 꽃, 너의 목소리도 그 무엇도
+最初から無かったみたい
+처음부터 없었던 것 같아
+
+死にたい僕は今日も息をして
+죽고 싶은 나는 오늘도 숨을 쉬고
+生きたい君は明日を見失って
+살고 싶은 너는 내일을 잃어버렸어
+なのに どうして悲しいのだろう
+그런데 어째서 슬픈 걸까
+いずれ死するのが人間だ
+언젠가 죽는 게 인간이야
+
+永遠なんてないけど
+영원한 건 없지만
+思い通りの日々じゃないけど
+생각대로 흘러가는 나날이 아니라고 해도
+脆く弱い糸に繋がれた
+무르고 약한 실에 연결된
+次の夜明けがまた訪れる
+다음 새벽이 다시 찾아와
+
+どんな世界も君がいるなら
+그 어떤 세상이라고 해도 네가 있다면
+生きていたいって思えたんだよ
+살아가고 싶다고 생각했어
+僕の地獄で君はいつでも絶えず鼓動する心臓だ
+내 지옥에서 너는 언제나 끊임없이 고동치는 심장이야
+
+いつしか君がくれたように
+언젠가 네가 준 것처럼
+
+僕も
+나도
+だれかの心臓になれたなら
+누군가의 심장이 될 수 있다면
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="quote">
+감상                    
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble bubble-left">왼</div>
+                    <div class="bubble bubble-right">오</div>
+                </div>
+                <div class="trivia">
+여담
+                </div>
+                -->
+            </div>
+
+
+
+
+<!-- 
+            <div class="song-entry" data-youtube-id="영상 id">
+                <div class="card-body">
+                    <div class="left-column">
+                        <div class="album-cover">
+                            <img src="앨범 커버" alt="앨범 커버">
+                        </div>
+                        <div class="youtube-player"></div>
+                        <div class="song-title">
+                            <h2 class="title">제목</h2>
+                            <p class="artist">가수</p>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="lyrics">
+가사
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">
+감상                    
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble bubble-left">왼</div>
+                    <div class="bubble bubble-right">오</div>
+                </div>
+                <div class="trivia">
+여담
+                </div>
+            </div>
+            
+-->
+
+        </div>
+
+    </div>
+    <div class="user-id-display">@KOT4T2U</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const songEntries = document.querySelectorAll('.song-entry');
+            songEntries.forEach(entry => {
+                const img = entry.querySelector('.album-cover img');
+                if (img && img.src) {
+                    entry.style.setProperty('--bg-image', `url('${img.src}')`);
+                }
+
+                const youtubeId = entry.dataset.youtubeId;
+                const playerContainer = entry.querySelector('.youtube-player');
+                if (youtubeId && playerContainer) {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${youtubeId}?controls=0&rel=0&autoplay=0`;
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
+                    playerContainer.appendChild(iframe);
+                }
+            });
+
+            const bubbles = document.querySelectorAll('.bubble');
+            bubbles.forEach(bubble => {
+                let originalText = bubble.innerHTML;
+
+                const italicRegex = /\*([^*]+)\*/g;
+                let processedText = originalText.replace(italicRegex, '<span class="italic-gray">$1</span>');
+
+                bubble.innerHTML = processedText;
+            });
+        });
+    </script>
+
+</body>
+</html>
